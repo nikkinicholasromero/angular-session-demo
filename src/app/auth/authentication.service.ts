@@ -10,17 +10,20 @@ import { AuthenticationResponse } from '../model/authentication-response';
   providedIn: 'root'
 })
 export class AuthenticationService {
-  private authenticationUrl: string = "http://localhost:8080/authenticate";
-  private httpOptions = {
-    headers: new HttpHeaders({
-      'Content-Type':  'application/json'
-    })
-  };
-  private _authenticationEvent: BehaviorSubject<AuthenticationEvent> = new BehaviorSubject<AuthenticationEvent>(AuthenticationEvent.INIT);
+  private authenticationUrl: string;
+  private httpOptions: {};
+  private _authenticationEvent: BehaviorSubject<AuthenticationEvent>;
 
   constructor(
-    private http: HttpClient, 
-    private router: Router) { 
+    private http: HttpClient,
+    private router: Router) {
+    this.authenticationUrl = "http://localhost:8080/authenticate";
+    this.httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json'
+      })
+    };
+    this._authenticationEvent = new BehaviorSubject<AuthenticationEvent>(AuthenticationEvent.INIT);
   }
 
   get authenticationEvent() {
@@ -28,7 +31,7 @@ export class AuthenticationService {
   }
 
   public isAuthenticated(): boolean {
-    return !!localStorage.getItem("token"); 
+    return !!localStorage.getItem("token");
   }
 
   public authenticate(request: AuthenticationRequest): void {
@@ -42,7 +45,7 @@ export class AuthenticationService {
         } else {
           this._authenticationEvent.next(AuthenticationEvent.FAILED);
         }
-      }, 
+      },
       (error) => {
         this._authenticationEvent.next(AuthenticationEvent.FAILED);
       }
