@@ -1,26 +1,57 @@
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
+import { BehaviorSubject } from 'rxjs';
+import { AuthenticationEvent } from '../model/authentication-event';
+import { AuthenticationRequest } from '../model/authentication-request';
+import { AuthenticationResponse } from '../model/authentication-response';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthenticationService {
-  constructor() { 
+  private authenticationUrl: string = "http://localhost:8080/authenticate";
+  private httpOptions = {
+    headers: new HttpHeaders({
+      'Content-Type':  'application/json'
+    })
+  };
+  private _authenticationEvent: BehaviorSubject<AuthenticationEvent> = new BehaviorSubject<AuthenticationEvent>(AuthenticationEvent.INIT);
+
+  constructor(
+    private http: HttpClient, 
+    private router: Router) { 
   }
 
-  public isAuthenticated() {
-    // TODO : Check local storage
-    return true;
+  get authenticationEvent() {
+    return this._authenticationEvent;
   }
 
-  public authenticate(username: string, password: string): boolean {
-    // TODO : Call web-service to validate token
-    // TODO : Save authentication token to local storage
-    // TODO : Return result
-    return true;
+  public isAuthenticated(): boolean {
+    return !!localStorage.getItem("token"); 
+  }
+
+  public authenticate(request: AuthenticationRequest): void {
+    this.http.post<AuthenticationResponse>(this.authenticationUrl, request, this.httpOptions).subscribe(
+      (response) => {
+        if (response) {
+          localStorage.setItem('token', response.token);
+          localStorage.setItem("expire", response.expire + "");
+          this.router.navigate(['']);
+          this._authenticationEvent.next(AuthenticationEvent.SUCCESS);
+        } else {
+          this._authenticationEvent.next(AuthenticationEvent.FAILED);
+        }
+      }, 
+      (error) => {
+        this._authenticationEvent.next(AuthenticationEvent.FAILED);
+      }
+    );
   }
 
   public logout(): void {
-    // TODO : Call web-service to invalidate token
-    // TODO : Delete authentication token in local storage
+    localStorage.removeItem("token");
+    localStorage.removeItem("expire");
+    this.router.navigate(['/login']);
   }
 }
