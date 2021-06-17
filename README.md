@@ -6,5 +6,6 @@
 
 # Build and Run
 ng build --prod
-docker build -t angular-session-demo .
-docker run --name angular-session-demo-container -d -p 80:80 angular-session-demo
+docker build --tag nikkinicholasromero/angular-session-demo .
+docker push nikkinicholasromero/angular-session-demo
+docker run --name angular-session-demo-container -d -p 80:80 nikkinicholasromero/angular-session-demo
