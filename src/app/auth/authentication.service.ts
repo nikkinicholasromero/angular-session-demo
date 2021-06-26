@@ -17,7 +17,7 @@ export class AuthenticationService {
   constructor(
     private http: HttpClient,
     private router: Router) {
-    this.authenticationUrl = "http://localhost:8080/authenticate";
+    this.authenticationUrl = "http://localhost:8080/users/auth";
     this.httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json'
@@ -38,8 +38,8 @@ export class AuthenticationService {
     this.http.post<AuthenticationResponse>(this.authenticationUrl, request, this.httpOptions).subscribe(
       (response) => {
         if (response) {
-          localStorage.setItem('token', response.token);
-          localStorage.setItem("expire", response.expire + "");
+          localStorage.setItem('token', response.accessToken.token);
+          localStorage.setItem("expire", response.accessToken.expire + "");
           this.router.navigate(['']);
           this._authenticationEvent.next(AuthenticationEvent.SUCCESS);
         } else {

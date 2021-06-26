@@ -40,6 +40,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   login() {
     const request: AuthenticationRequest = {
+      type: "root",
       username: this.form.controls['username'].value,
       password: this.form.controls['password'].value
     }

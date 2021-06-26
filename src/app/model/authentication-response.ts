@@ -1,4 +1,6 @@
+import { Token } from "./token";
+
 export interface AuthenticationResponse {
-    token: string;
-    expire: number;
+    accessToken: Token;
+    refreshToken: Token;
 }
